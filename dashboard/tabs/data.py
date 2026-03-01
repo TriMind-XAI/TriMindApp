@@ -2,7 +2,9 @@ import streamlit as st
 import medmnist
 import os
 from medmnist import INFO
+from torch.utils.data import DataLoader
 from torchvision import transforms
+import matplotlib.pyplot as plt
 
 def get_available_medmnist():
     return [
@@ -10,18 +12,18 @@ def get_available_medmnist():
         if value['task'] in ['binary-class', 'multi-class']
     ]
 @st.cache_resource
-def load_medmnist(dataset_name, size=28, transform=None):
+def load_medmnist(dataset_name, size=28, transform=None,batch=64):
     root = os.path.expanduser("~/.medmnist")
     download_flag = not os.path.exists(root)
     download_flag = True
     print("download_flag",download_flag)
 
     DataClass = getattr(medmnist, INFO[dataset_name]['python_class'])
+    
     transform = transforms.Compose([
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.5], std=[0.5])
     ])
-    
     train = DataClass(
         split='train',
         download=download_flag,
@@ -35,8 +37,35 @@ def load_medmnist(dataset_name, size=28, transform=None):
         size=size,
         transform=transform
     )
+
     return train,test
-    
+
+def show_samples_streamlit(dataloader, title, num_samples=6):
+    images, labels = next(iter(dataloader))
+    class_names = dataloader.dataset.info["label"]
+
+    num_samples = min(num_samples, len(images))
+    fig, axes = plt.subplots(1, num_samples, figsize=(12, 3))
+
+    for i in range(num_samples):
+        img = images[i].numpy()
+        # remove normalization
+        img = (img - img.min()) / (img.max() - img.min())
+
+        if img.shape[0] == 3:
+            img = img.transpose(1, 2, 0)
+        else:
+            img = img.squeeze()
+
+        label_idx = labels[i].item()
+        label_name = class_names[str(label_idx)]
+
+        axes[i].imshow(img, cmap="gray" if len(img.shape) == 2 else None)
+        axes[i].set_title(label_name)
+        axes[i].axis("off")
+
+    fig.suptitle(title)
+    st.pyplot(fig)
 
 def render_data_page():
 
@@ -55,8 +84,16 @@ def render_data_page():
         )
         st.session_state["selected_dataset"] = selected_dataset
         train_dataset,test_dataset = load_medmnist(selected_dataset)
-        st.write("Train size:", len(train_dataset))
-        st.write("Test size:", len(test_dataset))
+        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+        test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+        st.session_state["train_dataset"]=train_loader
+        st.session_state["test_dataset"]=test_loader
+        st.session_state["num_classes"] = len(train_loader.dataset.info["label"])
+        st.write("Train size: ", len(train_dataset))
+        st.write("Test size: ", len(test_dataset))
+        st.write("classes: ", st.session_state["num_classes"])
+        st.subheader("Sample Images")
+        show_samples_streamlit(st.session_state["train_dataset"], f"{selected_dataset} Samples")
 
         return selected_dataset
     return None

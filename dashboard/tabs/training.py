@@ -13,6 +13,14 @@ def render_training_page():
         model=simple_cnn.SmallCNN().to(device)
     if model_option is "ResNet-8":
         model=resnet.ResNet8().to(device)
-    st.button("train",on_click=train_loop(model,10))
+    st.button(
+        "train",
+        on_click=train_loop,
+    args=(
+        model,
+        st.session_state["train_dataset"],
+        st.session_state["test_dataset"],
+        10
+    ))
 
 
