@@ -6,6 +6,7 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 import matplotlib.pyplot as plt
 
+@st.cache_resource
 def get_available_medmnist():
     return [
         key for key, value in INFO.items()
@@ -40,16 +41,23 @@ def load_medmnist(dataset_name, size=28, transform=None,batch=64):
 
     return train,test
 
+
 def show_samples_streamlit(dataloader, title, num_samples=6):
     images, labels = next(iter(dataloader))
     class_names = dataloader.dataset.info["label"]
 
     num_samples = min(num_samples, len(images))
-    fig, axes = plt.subplots(1, num_samples, figsize=(12, 3))
+
+    st.subheader(title)
+
+    cols = st.columns(6)  
 
     for i in range(num_samples):
+        col = cols[i]
+
         img = images[i].numpy()
-        # remove normalization
+
+        # remove normalization 
         img = (img - img.min()) / (img.max() - img.min())
 
         if img.shape[0] == 3:
@@ -59,13 +67,18 @@ def show_samples_streamlit(dataloader, title, num_samples=6):
 
         label_idx = labels[i].item()
         label_name = class_names[str(label_idx)]
-
-        axes[i].imshow(img, cmap="gray" if len(img.shape) == 2 else None)
-        axes[i].set_title(label_name)
-        axes[i].axis("off")
-
-    fig.suptitle(title)
-    st.pyplot(fig)
+        col.image(img, use_container_width=True)
+        col.markdown(
+            f"""
+            <div style='text-align:center; font-size:14px; 
+                        word-wrap:break-word; 
+                        font-weight:600;
+                        margin-top:5px;'>
+                {label_name}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
 
 def render_data_page():
 
@@ -89,10 +102,10 @@ def render_data_page():
         st.session_state["train_dataset"]=train_loader
         st.session_state["test_dataset"]=test_loader
         st.session_state["num_classes"] = len(train_loader.dataset.info["label"])
+        st.session_state["in_channels"] = train_dataset[0][0].shape[0]
         st.write("Train size: ", len(train_dataset))
         st.write("Test size: ", len(test_dataset))
         st.write("classes: ", st.session_state["num_classes"])
-        st.subheader("Sample Images")
         show_samples_streamlit(st.session_state["train_dataset"], f"{selected_dataset} Samples")
 
         return selected_dataset

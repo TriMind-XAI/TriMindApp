@@ -16,16 +16,15 @@ st.title("TriMind Dashboard")
 st.write("Welcome to our Explainable AI App")
 
 data_tab, training_tab, prediciton_tab = st.tabs([
-    "data",
+    "Data",
     "Training",
-    "prediction"
+    "Prediction"
 ])
 with data_tab:
     render_data_page()
 
 with training_tab:
     render_training_page()
-    st.write("Not Implemented")
 
 with prediciton_tab:
     st.write("Not Implemented")
