@@ -6,6 +6,11 @@ from torch.utils.data import DataLoader
 from torchvision import transforms
 import matplotlib.pyplot as plt
 
+import pandas as pd
+from sklearn.datasets import load_breast_cancer
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
 def get_available_medmnist():
     return [
         key for key, value in INFO.items()
@@ -40,60 +45,117 @@ def load_medmnist(dataset_name, size=28, transform=None,batch=64):
 
     return train,test
 
+def load_breast_cancer_data():
+    data = load_breast_cancer()
+    X = pd.DataFrame(data.data, columns=data.feature_names)
+    y = pd.Series(data.target)
+    X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+    )
+
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    return X_train_scaled, X_test_scaled,y_train, y_test,data
+
 def show_samples_streamlit(dataloader, title, num_samples=6):
     images, labels = next(iter(dataloader))
     class_names = dataloader.dataset.info["label"]
 
-    num_samples = min(num_samples, len(images))
-    fig, axes = plt.subplots(1, num_samples, figsize=(12, 3))
+    st.subheader(title)
+
+    cols = st.columns(6)  
 
     for i in range(num_samples):
+        col = cols[i]
+
         img = images[i].numpy()
-        # remove normalization
+        img = img.transpose(1, 2, 0)
+
+        # remove normalization 
         img = (img - img.min()) / (img.max() - img.min())
-
-        if img.shape[0] == 3:
-            img = img.transpose(1, 2, 0)
-        else:
-            img = img.squeeze()
-
         label_idx = labels[i].item()
         label_name = class_names[str(label_idx)]
+        col.image(img, use_container_width=True)
+        col.markdown(
+            f"""
+            <div style='text-align:center; font-size:14px; 
+                        word-wrap:break-word; 
+                        font-weight:600;
+                        margin-top:5px;'>
+                {label_name}
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+def render_image_data():
 
-        axes[i].imshow(img, cmap="gray" if len(img.shape) == 2 else None)
-        axes[i].set_title(label_name)
-        axes[i].axis("off")
+    image_datasets = get_available_medmnist()
+    selected_dataset = st.selectbox(
+        "Select dataset",
+        image_datasets
+    )
 
-    fig.suptitle(title)
-    st.pyplot(fig)
+    st.session_state["selected_dataset"] = selected_dataset
+
+    train_dataset, test_dataset = load_medmnist(selected_dataset)
+
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
+    test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
+
+    st.session_state["train_dataset"] = train_loader
+    st.session_state["test_dataset"] = test_loader
+    st.session_state["num_classes"] = len(train_loader.dataset.info["label"])
+    st.session_state["in_channels"] = train_dataset[0][0].shape[0]
+
+    st.write("Train size: ", len(train_dataset))
+    st.write("Test size: ", len(test_dataset))
+    st.write("classes: ", st.session_state["num_classes"])
+
+    # st.subheader("Sample Images")
+
+    show_samples_streamlit(
+        st.session_state["train_dataset"],
+        f"{selected_dataset} Samples"
+    )
+
+
+def render_tabular_data():
+
+    selected_dataset = st.selectbox(
+        "Select dataset",
+        ["Breast Cancer Wisconsine"]
+    )
+    st.session_state["selected_dataset"] = selected_dataset
+
+    x_train, x_test, y_train, y_test, full_data = load_breast_cancer_data()
+    st.session_state["train_x"] = x_train
+    st.session_state["test_x"] = x_test
+    st.session_state["train_y"] = y_train
+    st.session_state["test_y"] = y_test
+    st.session_state["num_classes"] = 2
+
+    st.write("Train size: ", len(x_train))
+    st.write("Test size: ", len(x_test))
+    st.write("classes: ", st.session_state["num_classes"])
+    st.subheader("Sample Data")
+    df = pd.DataFrame(full_data.data, columns=full_data.feature_names)
+    df['target'] = full_data.target
+
+    st.dataframe(df.head(5))
+
 
 def render_data_page():
 
     st.header("Dataset Selection")
-
     data_type = st.selectbox(
         "Select data type",
         ["Image data", "Tabular data"]
     )
+    st.session_state["data_type"] = data_type
 
-    if data_type == "Image data":
-        image_datasets = get_available_medmnist()
-        selected_dataset = st.selectbox(
-            "Select dataset",
-            image_datasets
-        )
-        st.session_state["selected_dataset"] = selected_dataset
-        train_dataset,test_dataset = load_medmnist(selected_dataset)
-        train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True)
-        test_loader = DataLoader(test_dataset, batch_size=64, shuffle=False)
-        st.session_state["train_dataset"]=train_loader
-        st.session_state["test_dataset"]=test_loader
-        st.session_state["num_classes"] = len(train_loader.dataset.info["label"])
-        st.write("Train size: ", len(train_dataset))
-        st.write("Test size: ", len(test_dataset))
-        st.write("classes: ", st.session_state["num_classes"])
-        st.subheader("Sample Images")
-        show_samples_streamlit(st.session_state["train_dataset"], f"{selected_dataset} Samples")
+    if st.session_state["data_type"] == "Image data":
+        render_image_data()
 
-        return selected_dataset
-    return None
+    if st.session_state["data_type"] == "Tabular data":
+        render_tabular_data()

@@ -1,9 +1,13 @@
 # @title Training Loop
 import torch.optim as optim
 import torch
+import streamlit as st
 import time
 import torch.nn as nn
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+train_losses = []
+train_accuracies = []
+test_accuracies = []
 
 def train_epoch(model,train_loader,criterion,optimizer):
     model.train()
@@ -47,18 +51,20 @@ def test_epoch(model,test_loader):
     accuracy = 100 * correct / total
     return accuracy
 
-
 def train_loop(model,train_loader,test_loader,num_epochs=15):
+    train_losses = []
+    train_accuracies = []
+    test_accuracies = []
     for epoch in range(num_epochs):
-        start_time = time.time()
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=0.001,weight_decay=1e-4)
         criterion = nn.CrossEntropyLoss()
         train_loss, train_acc = train_epoch(model,train_loader,criterion,optimizer)
         test_acc = test_epoch(model,test_loader)
-        epoch_time = time.time() - start_time
+        train_losses.append(train_loss)
+        train_accuracies.append(train_acc)
+        test_accuracies.append(test_acc)
+        
         print(f"Epoch [{epoch+1}/{num_epochs}]")
-        print(f"Train Loss: {train_loss:.4f}")
-        print(f"Train Acc: {train_acc:.2f}%")
         print(f"Test Acc: {test_acc:.2f}%")
-        print(f"Epoch Time: {epoch_time:.2f} seconds")
         print("--------------------")
+    return train_accuracies, test_accuracies
