@@ -56,7 +56,7 @@ def train_loop(model,train_loader,test_loader,num_epochs=15):
     train_accuracies = []
     test_accuracies = []
     for epoch in range(num_epochs):
-        optimizer = optim.Adam(model.parameters(), lr=0.001)
+        optimizer = optim.Adam(model.parameters(), lr=0.001,weight_decay=1e-4)
         criterion = nn.CrossEntropyLoss()
         train_loss, train_acc = train_epoch(model,train_loader,criterion,optimizer)
         test_acc = test_epoch(model,test_loader)

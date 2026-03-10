@@ -4,19 +4,8 @@ from models.image_models import resnet,simple_cnn
 from training.image_train import train_loop
 import altair as alt
 import pandas as pd
-# def plotResults(num_epochs):
-#     metrics_df = pd.DataFrame({
-#         "Epoch": range(1, num_epochs + 1),
-#         "Train Loss": train_losses,
-#         "Train Accuracy": train_accuracies,
-#         "Test Accuracy": test_accuracies
-#     })
-#     st.subheader("Training vs Test Accuracy")
-#     st.line_chart(
-#     metrics_df.set_index("Epoch")[["Train Accuracy", "Test Accuracy"]]
-# )
 
-def render_training_page():
+def render_training_page_image():
     model_option = st.selectbox(
         "Select Model",
         ["SmallCNN","ResNet-8", "Pretrained Medical Model"]
