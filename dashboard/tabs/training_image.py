@@ -10,11 +10,13 @@ def render_training_page_image():
         "Select Model",
         ["SmallCNN","ResNet-8", "Pretrained Medical Model"]
     )
+    st.session_state["accuracy"] = None
+    st.session_state["metrics_df"] = None
     model=None
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if model_option is "SmallCNN":
+    if model_option == "SmallCNN":
         model=simple_cnn.SmallCNN(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
-    if model_option is "ResNet-8":
+    if model_option == "ResNet-8":
         model=resnet.ResNet8(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
     
     if st.button("Train Model"):
@@ -23,7 +25,7 @@ def render_training_page_image():
                 model,
                 st.session_state["train_dataset"],
                 st.session_state["test_dataset"],
-                15
+                5
             )
         metrics_df = pd.DataFrame({
         "Epoch": range(1, len(train_accuracies) + 1),
@@ -32,8 +34,9 @@ def render_training_page_image():
         })
 
         st.session_state["metrics_df"] = metrics_df
+        st.session_state["model"]=model 
 
-    if "metrics_df" in st.session_state:
+    if st.session_state["metrics_df"] is not None:
         
         df = st.session_state["metrics_df"]
 
@@ -53,4 +56,4 @@ def render_training_page_image():
             title="Training vs Test Accuracy"
         )
 
-        st.altair_chart(accuracy_chart, use_container_width=True)
+        st.altair_chart(accuracy_chart, width="stretch")

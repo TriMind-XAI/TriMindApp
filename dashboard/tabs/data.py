@@ -76,7 +76,7 @@ def show_samples_streamlit(dataloader, title, num_samples=6):
         img = (img - img.min()) / (img.max() - img.min())
         label_idx = labels[i].item()
         label_name = class_names[str(label_idx)]
-        col.image(img, use_container_width=True)
+        col.image(img, width="stretch")
         col.markdown(
             f"""
             <div style='text-align:center; font-size:14px; 
