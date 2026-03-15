@@ -1,5 +1,6 @@
 import streamlit as st
 
+from training.app_states import init_session_state
 from utils import apply_theme
 from tabs.data import render_data_page
 from tabs.training_image import render_training_page_image
@@ -14,6 +15,7 @@ st.set_page_config(
     page_title="TriMind",
     layout="wide"
 )
+init_session_state()
 st.title("TriMind Dashboard")
 
 st.write("Welcome to our Explainable AI App")

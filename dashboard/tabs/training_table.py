@@ -10,6 +10,7 @@ def render_training_page_tabular():
         "Select Model",
         ["RandomForest","SVM","XGBoost","DecisionTree", "MLP","Pretrained Model"]
     )
+    st.session_state["model_name"] = model_option
     st.session_state["accuracy"] = None
     st.session_state["report"] = None
     st.session_state["metrics_df"] = None

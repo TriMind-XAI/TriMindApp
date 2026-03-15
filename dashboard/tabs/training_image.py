@@ -25,7 +25,7 @@ def render_training_page_image():
                 model,
                 st.session_state["train_dataset"],
                 st.session_state["test_dataset"],
-                5
+                2
             )
         metrics_df = pd.DataFrame({
         "Epoch": range(1, len(train_accuracies) + 1),

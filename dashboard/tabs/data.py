@@ -48,6 +48,7 @@ def load_medmnist(dataset_name, size=28, transform=None,batch=64):
 def load_breast_cancer_data():
     data = load_breast_cancer()
     X = pd.DataFrame(data.data, columns=data.feature_names)
+    st.session_state["feature_names"] = X
     y = pd.Series(data.target)
     X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y

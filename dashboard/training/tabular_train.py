@@ -25,7 +25,7 @@ def train_and_evaluate(model_name):
             st.session_state["test_y"],
             epochs=70
         )
-
+        st.session_state["model"]=model
         model.eval()
         with torch.no_grad():
             probs = torch.sigmoid(
@@ -37,6 +37,7 @@ def train_and_evaluate(model_name):
 
     else:
         model = get_model(model_name)
+        st.session_state["model"]=model
         model.fit(st.session_state["train_x"], st.session_state["train_y"])
         preds = model.predict(st.session_state["test_x"])
         accuracy = accuracy_score(st.session_state["test_y"], preds)
