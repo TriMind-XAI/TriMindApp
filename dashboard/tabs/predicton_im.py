@@ -25,12 +25,13 @@ def run_explanation(device,sample_image):
     explainer = MultiviewExplainer(st.session_state["model"], device=device)
     # Generate explanations
     results = explainer.explain(sample_image)
+    st.session_state["exp_results"]=results
     # Visualize
     print("\n📊 Visualizing explanations...")
     explainer.visualize_explanations(sample_image, results)
-
     # Analyze consistency
-    # consistency = analyze_consistency(results)
+    st.session_state["consistency"] = analyze_consistency(results)
+
 
 def render_prediction_page_image():
     if "img_tensor" not in st.session_state:

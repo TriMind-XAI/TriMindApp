@@ -22,7 +22,10 @@ class MultiviewExplainer:
         # Note: self.model.conv3 might need adjustment based on the actual model architecture
         # For ResNet8, the layer is 'layer3' in the forward pass, so a better choice might be model.layer3.conv2 or similar
         # For now, let's assume `conv3` is a placeholder or adjust if needed during execution.
-        self.gradcam = LayerGradCam(self.model, self.model.layer3.conv2)
+        if st.session_state["model_name"]=="ResNet-8":
+            self.gradcam = LayerGradCam(self.model, self.model.layer3.conv2)
+        else:
+            self.gradcam = LayerGradCam(self.model, self.model.conv2)
 
     def explain(self, input_image, target_class=None):
         """Generate all explanations"""

@@ -24,3 +24,14 @@ def apply_theme(dark_mode):
                 }
             </style>
         """, unsafe_allow_html=True)
+def get_class_name(class_idx):
+
+    labels = st.session_state.get("class_names")
+
+    if labels is None:
+        return str(class_idx)
+
+    try:
+        return labels[str(class_idx)]
+    except:
+        return labels[class_idx]

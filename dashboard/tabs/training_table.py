@@ -2,8 +2,6 @@ import streamlit as st
 import pandas as pd
 import altair as alt
 from training.tabular_train import train_and_evaluate
-if "accuracy" not in st.session_state:
-    st.session_state["accuracy"] = None
     
 def render_training_page_tabular():
     model_option = st.selectbox(

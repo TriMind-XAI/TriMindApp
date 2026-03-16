@@ -1,5 +1,6 @@
 import streamlit as st
 
+from tabs.explain import render_explanation_page
 from training.app_states import init_session_state
 from utils import apply_theme
 from tabs.data import render_data_page
@@ -23,10 +24,11 @@ st.write("Welcome to our Explainable AI App")
 if "data_type" not in st.session_state:
     st.session_state["data_type"] = "Image data"
     
-data_tab, training_tab, prediciton_tab = st.tabs([
+data_tab, training_tab, prediciton_tab,Explain_tab = st.tabs([
     "Data",
     "Training",
-    "Prediction"
+    "Prediction",
+    "Explain"
 ])
 with data_tab:
     render_data_page()
@@ -42,3 +44,8 @@ with prediciton_tab:
         render_prediction_page_image()
     else:
         render_prediction_page_tabular()
+with Explain_tab:
+    if st.session_state["data_type"] == "Image data":
+        render_explanation_page()
+    else:
+        st.write("unimplemented")

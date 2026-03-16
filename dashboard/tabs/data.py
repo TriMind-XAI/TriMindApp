@@ -107,6 +107,7 @@ def render_image_data():
     st.session_state["train_dataset"] = train_loader
     st.session_state["test_dataset"] = test_loader
     st.session_state["num_classes"] = len(train_loader.dataset.info["label"])
+    st.session_state["class_names"] = st.session_state["train_dataset"].dataset.info["label"]
     st.session_state["in_channels"] = train_dataset[0][0].shape[0]
 
     st.write("Train size: ", len(train_dataset))
