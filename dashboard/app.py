@@ -10,12 +10,18 @@ from tabs.predicton_im import render_prediction_page_image
 from tabs.prediction_tab import render_prediction_page_tabular
 from components.sidebar import render_sidebar
 
+import torch
+
 language_mode,dark_mode = render_sidebar()
 # apply_theme(dark_mode)
 st.set_page_config(
     page_title="TriMind",
     layout="wide"
 )
+if "device" not in st.session_state:
+    st.session_state["device"] = torch.device(
+        "cuda" if torch.cuda.is_available() else "cpu"
+    )
 init_session_state()
 st.title("TriMind Dashboard")
 

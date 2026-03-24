@@ -5,7 +5,7 @@ import streamlit as st
 import time
 import torch.nn as nn
 import copy
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = st.session_state["device"]
 train_losses = []
 train_accuracies = []
 test_accuracies = []

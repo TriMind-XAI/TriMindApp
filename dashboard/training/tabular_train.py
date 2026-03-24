@@ -9,9 +9,7 @@ from sklearn.metrics import (
     classification_report
 )
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-
+device = st.session_state["device"]
 
 def train_and_evaluate(model_name):
     print(f"\nTraining {model_name}...\n")

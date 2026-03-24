@@ -13,6 +13,7 @@ def render_training_page_tabular():
     st.session_state["report"] = None
     st.session_state["metrics_df"] = None
     if st.button("Train Model"):
+        st.session_state.pop("explainer", None)
         with st.spinner("Training model... Please wait ⏳"):
             accuracy,report= train_and_evaluate(model_option)
             st.session_state["accuracy"] = accuracy

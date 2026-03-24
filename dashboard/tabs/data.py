@@ -44,20 +44,14 @@ def load_medmnist(dataset_name, size=28, transform=None,batch=64):
     )
 
     return train,test
-
+@st.cache_data
 def load_breast_cancer_data():
     data = load_breast_cancer()
-    st.session_state["tabular_class_names"] = {
-        0: "Malignant",
-        1: "Benign"
-    }
     X = pd.DataFrame(data.data, columns=data.feature_names)
-    st.session_state["feature_names"] = X
     y = pd.Series(data.target)
     X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
     )
-
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
@@ -133,8 +127,13 @@ def render_tabular_data():
         ["Breast Cancer Wisconsine"]
     )
     st.session_state["selected_dataset"] = selected_dataset
-
     x_train, x_test, y_train, y_test, full_data = load_breast_cancer_data()
+    st.session_state["tabular_class_names"] = {
+        0: "Malignant",
+        1: "Benign"
+    }
+    st.session_state["feature_names"] = pd.DataFrame(full_data.data, columns=full_data.feature_names)
+
     st.session_state["train_x"] = x_train
     st.session_state["test_x"] = x_test
     st.session_state["train_y"] = y_train

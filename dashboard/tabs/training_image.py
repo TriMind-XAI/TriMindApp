@@ -19,7 +19,7 @@ def render_training_page_image():
     st.session_state["accuracy"] = None
     st.session_state["metrics_df"] = None
     model=None
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device = st.session_state["device"]
     if model_option == "ResNet-8⭐":
         model=resnet.ResNet8(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
     if model_option == "SmallCNN":
@@ -28,9 +28,9 @@ def render_training_page_image():
         model=simple_cnn.DropOutCNN(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
     
     if st.button("Train Model"):
+        st.session_state.pop("explainer", None)
         with st.spinner("Training model... Please wait ⏳"):
             progress_bar = st.progress(0)
-
             train_accuracies, test_accuracies = train_loop(
                 model,
                 st.session_state["train_dataset"],

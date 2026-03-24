@@ -21,8 +21,8 @@ def run_prediction(img_tensor):
 
 def run_explanation(device,sample_image):
     # Create explainer
-    print("\nCreating explainer...")
-    explainer = MultiviewExplainer(st.session_state["model"], device=device)
+    print("\nCreating/getting explainer...")
+    explainer = get_explainer()
     # Generate explanations
     results = explainer.explain(sample_image)
     st.session_state["exp_results"]=results
@@ -32,11 +32,18 @@ def run_explanation(device,sample_image):
     # Analyze consistency
     st.session_state["consistency"] = analyze_consistency(results)
 
+def get_explainer():
+    if "explainer" not in st.session_state:
+        st.session_state["explainer"] = MultiviewExplainer(
+            st.session_state["model"],
+            device=st.session_state["device"]
+        )
+    return st.session_state["explainer"]
 
 def render_prediction_page_image():
     if "img_tensor" not in st.session_state:
         st.session_state["img_tensor"]=None
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    device=st.session_state["device"]
     if st.button("Pick Random Sample"):
         test_loader = st.session_state["test_dataset"]
 
