@@ -47,6 +47,10 @@ def load_medmnist(dataset_name, size=28, transform=None,batch=64):
 
 def load_breast_cancer_data():
     data = load_breast_cancer()
+    st.session_state["tabular_class_names"] = {
+        0: "Malignant",
+        1: "Benign"
+    }
     X = pd.DataFrame(data.data, columns=data.feature_names)
     st.session_state["feature_names"] = X
     y = pd.Series(data.target)

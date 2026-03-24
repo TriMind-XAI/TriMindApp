@@ -4,6 +4,7 @@ import torch
 import streamlit as st
 import time
 import torch.nn as nn
+import copy
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 train_losses = []
 train_accuracies = []
@@ -51,20 +52,28 @@ def test_epoch(model,test_loader):
     accuracy = 100 * correct / total
     return accuracy
 
-def train_loop(model,train_loader,test_loader,num_epochs=15):
+def train_loop(model,train_loader,test_loader,progress_bar,num_epochs=15):
     train_losses = []
     train_accuracies = []
     test_accuracies = []
+    optimizer = optim.Adam(model.parameters(), lr=0.001,weight_decay=1e-4)
+    criterion = nn.CrossEntropyLoss()
+    best_acc = 0
+    best_state = None
     for epoch in range(num_epochs):
-        optimizer = optim.Adam(model.parameters(), lr=0.001,weight_decay=1e-4)
-        criterion = nn.CrossEntropyLoss()
         train_loss, train_acc = train_epoch(model,train_loader,criterion,optimizer)
         test_acc = test_epoch(model,test_loader)
         train_losses.append(train_loss)
         train_accuracies.append(train_acc)
         test_accuracies.append(test_acc)
-        
+
+        progress = (epoch + 1) / num_epochs
+        progress_bar.progress(progress)
+        if test_acc > best_acc:
+            best_acc = test_acc
+            best_state = copy.deepcopy(model.state_dict())
         print(f"Epoch [{epoch+1}/{num_epochs}]")
         print(f"Test Acc: {test_acc:.2f}%")
         print("--------------------")
+    model.load_state_dict(best_state)
     return train_accuracies, test_accuracies

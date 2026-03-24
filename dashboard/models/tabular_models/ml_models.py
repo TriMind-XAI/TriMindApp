@@ -5,7 +5,7 @@ from xgboost import XGBClassifier
 from sklearn.ensemble import RandomForestClassifier
 
 def get_model(name):
-    if name == "RandomForest":
+    if name == "RandomForest⭐":
         return RandomForestClassifier()
     elif name == "SVM":
         return SVC(probability=True)

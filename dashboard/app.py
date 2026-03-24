@@ -1,6 +1,6 @@
 import streamlit as st
 
-from tabs.explain import render_explanation_page
+from tabs.explain import render_explanation_page_image,render_explanation_page_tabular
 from training.app_states import init_session_state
 from utils import apply_theme
 from tabs.data import render_data_page
@@ -46,6 +46,6 @@ with prediciton_tab:
         render_prediction_page_tabular()
 with Explain_tab:
     if st.session_state["data_type"] == "Image data":
-        render_explanation_page()
+        render_explanation_page_image()
     else:
-        st.write("unimplemented")
+        render_explanation_page_tabular()

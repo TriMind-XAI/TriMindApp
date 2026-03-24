@@ -6,7 +6,7 @@ from training.tabular_train import train_and_evaluate
 def render_training_page_tabular():
     model_option = st.selectbox(
         "Select Model",
-        ["RandomForest","SVM","XGBoost","DecisionTree", "MLP","Pretrained Model"]
+        ["RandomForest⭐","SVM","XGBoost","DecisionTree", "MLP","Pretrained Model"]
     )
     st.session_state["model_name"] = model_option
     st.session_state["accuracy"] = None

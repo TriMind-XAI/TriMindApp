@@ -4,6 +4,10 @@ import streamlit as st
 from captum.attr import IntegratedGradients, Saliency, GradientShap, LayerGradCam
 import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
+import os
+import json
+
+from utils import get_class_name
 
 
 #@title XAI Explainer Class
@@ -22,7 +26,7 @@ class MultiviewExplainer:
         # Note: self.model.conv3 might need adjustment based on the actual model architecture
         # For ResNet8, the layer is 'layer3' in the forward pass, so a better choice might be model.layer3.conv2 or similar
         # For now, let's assume `conv3` is a placeholder or adjust if needed during execution.
-        if st.session_state["model_name"]=="ResNet-8":
+        if st.session_state["model_name"]=="ResNet-8⭐":
             self.gradcam = LayerGradCam(self.model, self.model.layer3.conv2)
         else:
             self.gradcam = LayerGradCam(self.model, self.model.conv2)
@@ -143,3 +147,62 @@ def analyze_consistency(results):
         'correlations': correlations,
         'average_correlation': avg_correlation
     }
+def generate_narrative_hf(client, results, consistency_metrics, audience='Clinician'):
+    pred_class = get_class_name(results["prediction"])
+
+    context_data = {
+        "diagnosis": pred_class,
+        "confidence": f"{results['confidence']:.2%}",
+        "xai_consistency": f"{consistency_metrics['average_correlation']:.3f}",
+        "method_details": {
+            "GradCAM": "Regional localization",
+            "IntegratedGradients": "Pixel-level attribution",
+            "Saliency": "Edge/Density sensitivity",
+            "GradientSHAP": "Robust feature importance"
+        }
+    }
+
+    personas = {
+        'Clinician': (
+            f"You are a Radiologist analysing {st.session_state['selected_dataset']} classification results."
+            "Write a brief clinical finding report using terms like consolidation, opacity, and feature attribution."
+            "Describe which parts of the image influenced the prediction and how strongly they contributed."
+        ),
+        'Researcher': (
+            f"You are an AI auditor evaluating a {st.session_state['selected_dataset']} image classification model. "
+            "Analyze which regions influenced the prediction, assess attention strength, "
+            "and discuss reliability based only on the provided data."
+        ),
+        'Patient': (
+            f"You are a doctor explaining {st.session_state['selected_dataset']} image classificaiton results to a patient."
+            "Explain the results simply, avoid jargon, and be reassuring."
+        )
+    }
+
+
+    user_message = f"""
+        DATA TO ANALYZE:
+        {json.dumps(context_data, indent=2)}
+
+        INSTRUCTIONS:
+        - Reference the confidence score and XAI consistency.
+        - If consistency > 0.6, state that the explanation is reliable.
+        - If consistency is low, mention possible uncertainty.
+        - Explain which regions of the image MOST influenced the prediction.
+        - Use GradCAM as the primary source for localization (where the model focused).
+        - Refer to attention strength and whether it is concentrated or spread out.
+        - Avoid describing XAI methods themselves (no generic definitions).
+        - Focus only on what the model used to make the decision.
+        - Do NOT make unsupported medical diagnoses.
+        - Keep response to 2 short paragraphs.
+    """
+    response = client.chat_completion(
+        messages=[
+            {"role": "system", "content":  personas[audience]},
+            {"role": "user", "content": user_message}
+        ],
+        max_tokens=400,
+        temperature=0.5,
+    )
+
+    return response.choices[0].message.content

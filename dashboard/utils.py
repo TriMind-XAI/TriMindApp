@@ -35,3 +35,11 @@ def get_class_name(class_idx):
         return labels[str(class_idx)]
     except:
         return labels[class_idx]
+def get_tabular_class_name(class_idx):
+
+    labels = st.session_state.get("tabular_class_names")
+
+    if labels is None:
+        return str(class_idx)
+
+    return labels.get(class_idx, str(class_idx))

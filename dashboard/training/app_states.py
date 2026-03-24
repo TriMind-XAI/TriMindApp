@@ -14,6 +14,7 @@ def init_session_state():
         "test_y": None,
         "num_classes": None,
         "class_names":None,
+        "tabular_class_names":None,
         "img_tensor":None,
         "model":None,
         "model_name":None,
@@ -22,6 +23,8 @@ def init_session_state():
         "tabular_sample":None,
         "consistency":None,
         "exp_results":None,
+        "tabular_results":None,
+        "tabular_shap_values":None,
         "data_type": "Image data"
     }
 
