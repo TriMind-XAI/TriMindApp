@@ -40,11 +40,10 @@ def explain_with_shap(sample):
         
         st.session_state["tabular_shap_values"] = shap_values
 
-        # DeepExplainer returns list for binary classification
         if isinstance(shap_values, list):
             shap_values = shap_values[0]
 
-    elif st.session_state["model_name"] =="SVM":  # SVM
+    elif st.session_state["model_name"] =="SVM": 
         explainer = shap.KernelExplainer(
             model.predict_proba,
             X_background
@@ -55,19 +54,11 @@ def explain_with_shap(sample):
 
         if isinstance(shap_values, list):
             shap_values = shap_values[1]
-        resutls = {
-        "prediction": st.session_state["exp_results"]["prediction"],
-        "confidence": st.session_state["exp_results"]["confidence"],
-        "attributions": {
-            "shap": shap_values
-        }
-    }
     else:
         explainer = shap.TreeExplainer(model)
         shap_values = explainer.shap_values(X_sample)
         
         st.session_state["tabular_shap_values"] = shap_values
-        # For binary classification take class 1
         if isinstance(shap_values, list):
             shap_values = shap_values[1]
 
@@ -105,8 +96,6 @@ def explain_with_shap(sample):
         data=X_sample_df.iloc[0],
         feature_names=list(st.session_state["feature_names"])
     )
-    st.session_state['exp_results']=exp
-
     shap.plots.bar(exp, show=False)
 
     fig = plt.gcf()
@@ -132,13 +121,13 @@ def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
     features_name_list=feature_names.columns.tolist()
     for i in range(len(features_name_list)):
         name = features_name_list[i]
-        # ✅ Add human meaning here
+        # translate techinical names
         if name in feature_descriptions:
             name = f"{name} ({feature_descriptions[name]})"
         # importance
         total = np.sum(np.abs(shap_values))
         importance = abs(shap_values[i]) / total
-        # effect
+        # explain effect if its positive or negative  
         effect=""
         if shap_values[i] > 0:
             effect = "increases"

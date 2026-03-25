@@ -9,8 +9,6 @@ from sklearn.metrics import (
     classification_report
 )
 
-device = st.session_state["device"]
-
 def train_and_evaluate(model_name):
     print(f"\nTraining {model_name}...\n")
 

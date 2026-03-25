@@ -22,7 +22,7 @@ def init_session_state():
         "true_label":None,
         "tabular_sample":None,
         "consistency":None,
-        "exp_results":None,
+        "image_exp_results":None,
         "tabular_results":None,
         "tabular_shap_values":None,
         "data_type": "Image data"
@@ -63,7 +63,7 @@ def reset_prediction_states():
         "img_display",
         "true_label",
         "consistency",
-        "exp_results"
+        "image_exp_results"
     ]
 
     for key in keys:

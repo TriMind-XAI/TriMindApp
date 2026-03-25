@@ -9,10 +9,10 @@ def get_llm_client():
 
 def render_explanation_page_image():
     client = get_llm_client()
-    if st.session_state['exp_results'] != None:
+    if st.session_state['image_exp_results'] != None:
         for target in ['Clinician','Researcher', 'Patient']:
             st.subheader(f"{target} Explanation")
-            narrative = generate_narrative_hf(client, results=st.session_state["exp_results"], consistency_metrics=st.session_state["consistency"], audience=target)
+            narrative = generate_narrative_hf(client, results=st.session_state["image_exp_results"], consistency_metrics=st.session_state["consistency"], audience=target)
             st.write(narrative)
             
 def render_explanation_page_tabular():

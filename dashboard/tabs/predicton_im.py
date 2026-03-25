@@ -25,7 +25,7 @@ def run_explanation(device,sample_image):
     explainer = get_explainer()
     # Generate explanations
     results = explainer.explain(sample_image)
-    st.session_state["exp_results"]=results
+    st.session_state["image_exp_results"]=results
     # Visualize
     print("\n📊 Visualizing explanations...")
     explainer.visualize_explanations(sample_image, results)

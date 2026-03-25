@@ -83,6 +83,7 @@ class MultiviewExplainer:
 
         print("✅ All explanations generated!")
         return results
+    
     def visualize_explanations(self, input_image, results):
         """Visualize all XAI methods"""
         
@@ -147,25 +148,71 @@ def analyze_consistency(results):
         'correlations': correlations,
         'average_correlation': avg_correlation
     }
+def extract_image_insights(attr):
+    h, w = attr.shape
+
+    regions = {
+        "top-left": attr[:h//2, :w//2],
+        "top-right": attr[:h//2, w//2:],
+        "bottom-left": attr[h//2:, :w//2],
+        "bottom-right": attr[h//2:, w//2:]
+    }
+
+    region_scores = []
+
+    for name, region in regions.items():
+        score = float(np.mean(region))
+        region_scores.append({
+            "region": name,
+            "importance": round(score, 3)
+        })
+
+    # normalize like SHAP
+    total = sum(abs(r["importance"]) for r in region_scores)
+    for r in region_scores:
+        r["importance"] = round(abs(r["importance"]) / total*100, 2)
+
+    # sort
+    region_scores = sorted(region_scores, key=lambda x: x["importance"], reverse=True)
+
+    return region_scores
+
+def compute_attention_strength(attr):
+    return round(float(np.mean(np.abs(attr))), 3)
+
+def compute_focus_type(region_scores):
+
+    top = region_scores[0]["importance"]
+    if top > 0.7:
+        return "highly focused"
+    elif top > 0.5:
+        return "moderately focused"
+    elif top > 0.3:
+        return "slightly focused"
+    else:
+        return "diffuse"
+        
 def generate_narrative_hf(client, results, consistency_metrics, audience='Clinician'):
     pred_class = get_class_name(results["prediction"])
-
+    gradcam_attr = results['attributions']['gradcam']
+    regions = extract_image_insights(gradcam_attr)
+    attention_strength = compute_attention_strength(gradcam_attr)
+    focus_type = compute_focus_type(regions)
     context_data = {
         "diagnosis": pred_class,
         "confidence": f"{results['confidence']:.2%}",
         "xai_consistency": f"{consistency_metrics['average_correlation']:.3f}",
-        "method_details": {
-            "GradCAM": "Regional localization",
-            "IntegratedGradients": "Pixel-level attribution",
-            "Saliency": "Edge/Density sensitivity",
-            "GradientSHAP": "Robust feature importance"
+        "attention": {
+            "top_regions_pecsentage": regions[:2],
+            "focus_type": focus_type,
+            "strength": attention_strength
         }
     }
 
     personas = {
         'Clinician': (
             f"You are a Radiologist analysing {st.session_state['selected_dataset']} classification results."
-            "Write a brief clinical finding report using terms like consolidation, opacity, and feature attribution."
+            "Write a brief clinical finding report using appropriate clinical language when supported by the data"
             "Describe which parts of the image influenced the prediction and how strongly they contributed."
         ),
         'Researcher': (
@@ -188,11 +235,13 @@ def generate_narrative_hf(client, results, consistency_metrics, audience='Clinic
         - Reference the confidence score and XAI consistency.
         - If consistency > 0.6, state that the explanation is reliable.
         - If consistency is low, mention possible uncertainty.
-        - Explain which regions of the image MOST influenced the prediction.
         - Use GradCAM as the primary source for localization (where the model focused).
+        - Explain which regions of the image MOST influenced the prediction.
         - Refer to attention strength and whether it is concentrated or spread out.
-        - Avoid describing XAI methods themselves (no generic definitions).
+        - Mention attention pattern only once clearly.
+        - Use "focus_type" to describe attention (e.g., diffuse, concentrated).
         - Focus only on what the model used to make the decision.
+        - Avoid repeating the same concept multiple times.
         - Do NOT make unsupported medical diagnoses.
         - Keep response to 2 short paragraphs.
     """

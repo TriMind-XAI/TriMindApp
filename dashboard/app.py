@@ -18,11 +18,11 @@ st.set_page_config(
     page_title="TriMind",
     layout="wide"
 )
+init_session_state()
 if "device" not in st.session_state:
     st.session_state["device"] = torch.device(
         "cuda" if torch.cuda.is_available() else "cpu"
     )
-init_session_state()
 st.title("TriMind Dashboard")
 
 st.write("Welcome to our Explainable AI App")

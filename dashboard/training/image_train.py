@@ -5,12 +5,13 @@ import streamlit as st
 import time
 import torch.nn as nn
 import copy
-device = st.session_state["device"]
 train_losses = []
 train_accuracies = []
 test_accuracies = []
 
 def train_epoch(model,train_loader,criterion,optimizer):
+    
+    device = st.session_state["device"]
     model.train()
     running_loss = 0
     correct = 0
@@ -38,7 +39,8 @@ def test_epoch(model,test_loader):
     model.eval()
     correct = 0
     total = 0
-
+    
+    device = st.session_state["device"]
     with torch.no_grad():
         for images, labels in test_loader:
             images = images.to(device)
