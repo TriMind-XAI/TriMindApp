@@ -2,7 +2,7 @@ import streamlit as st
 
 from tabs.explain import render_explanation_page_image,render_explanation_page_tabular
 from training.app_states import init_session_state
-from utils import apply_theme
+# from utils import apply_theme
 from tabs.data import render_data_page
 from tabs.training_image import render_training_page_image
 from tabs.training_table import render_training_page_tabular
@@ -11,9 +11,7 @@ from tabs.prediction_tab import render_prediction_page_tabular
 from components.sidebar import render_sidebar
 
 import torch
-
-language_mode,dark_mode = render_sidebar()
-# apply_theme(dark_mode)
+render_sidebar()
 st.set_page_config(
     page_title="TriMind",
     layout="wide"
@@ -23,9 +21,9 @@ if "device" not in st.session_state:
     st.session_state["device"] = torch.device(
         "cuda" if torch.cuda.is_available() else "cpu"
     )
-st.title("TriMind Dashboard")
+# st.title("TriMind Dashboard")
 
-st.write("Welcome to our Explainable AI App")
+# st.write("Welcome to our Explainable AI App")
 
 if "data_type" not in st.session_state:
     st.session_state["data_type"] = "Image data"

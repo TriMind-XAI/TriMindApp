@@ -57,11 +57,9 @@ def load_breast_cancer_data():
     X_test_scaled = scaler.transform(X_test)
     return X_train_scaled, X_test_scaled,y_train, y_test,data
 
-def show_samples_streamlit(dataloader, title, num_samples=6):
+def show_samples_streamlit(dataloader, num_samples=6):
     images, labels = next(iter(dataloader))
     class_names = dataloader.dataset.info["label"]
-
-    st.subheader(title)
 
     cols = st.columns(6)  
 
@@ -87,6 +85,21 @@ def show_samples_streamlit(dataloader, title, num_samples=6):
             """,
             unsafe_allow_html=True
         )
+def metric_box(title, value):
+    st.markdown(f"""
+        <div style="
+            background-color:#262930;
+            padding:10px;
+            margin:10px 0px 10px 0;
+            border-radius:12px;
+            text-align:center;
+            box-shadow:0 0 10px rgba(0,0,0,0.3);
+        ">
+            <div style="font-size:20px;color:white">{title}</div>
+            <div style="font-size:36px;font-weight:bold;color:#22D3EE">{value}</div>
+        </div>
+    """, unsafe_allow_html=True)
+
 def render_image_data():
 
     image_datasets = get_available_medmnist()
@@ -108,15 +121,19 @@ def render_image_data():
     st.session_state["class_names"] = st.session_state["train_dataset"].dataset.info["label"]
     st.session_state["in_channels"] = train_dataset[0][0].shape[0]
 
-    st.write("Train size: ", len(train_dataset))
-    st.write("Test size: ", len(test_dataset))
-    st.write("classes: ", st.session_state["num_classes"])
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        metric_box("Train Size", len(train_dataset))
 
-    # st.subheader("Sample Images")
+    with col2:
+        metric_box("Test Size", len(test_dataset))
+
+    with col3:
+        metric_box("Classes", st.session_state["num_classes"])
+    st.subheader("Samples")
 
     show_samples_streamlit(
         st.session_state["train_dataset"],
-        f"{selected_dataset} Samples"
     )
 
 
@@ -139,11 +156,16 @@ def render_tabular_data():
     st.session_state["train_y"] = y_train
     st.session_state["test_y"] = y_test
     st.session_state["num_classes"] = 2
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        metric_box("Train Size", len(x_train))
 
-    st.write("Train size: ", len(x_train))
-    st.write("Test size: ", len(x_test))
-    st.write("classes: ", st.session_state["num_classes"])
-    st.subheader("Sample Data")
+    with col2:
+        metric_box("Test Size", len(x_test))
+
+    with col3:
+        metric_box("Classes", st.session_state["num_classes"])
+    st.subheader("Samples")
     df = pd.DataFrame(full_data.data, columns=full_data.feature_names)
     df['target'] = full_data.target
 

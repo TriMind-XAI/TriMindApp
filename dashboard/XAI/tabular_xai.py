@@ -180,7 +180,7 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
     - Do NOT infer medical meaning beyond given data
     - Only describe statistical influence of features
     - The "value" is the feature value, NOT the effect direction.
-    - The "effect" determines whether it increases or decreases prediction.
+    - The "effect" determines whether it increases of positive value or decreases if it's negative prediction.
     - Do not infer direction from the value.
     """
     personas = {

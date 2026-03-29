@@ -80,4 +80,5 @@ def render_prediction_page_tabular():
             run_tabular_prediction(sample)
             with st.spinner("🔍 Generating SHAP explanations..."):
                 explain_with_shap(sample)
+                st.toast("Prediciton Complete", icon="😍")
             

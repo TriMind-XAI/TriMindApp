@@ -98,6 +98,7 @@ def render_prediction_page_image():
             if st.session_state["model"] is not None:
                 run_prediction(st.session_state["img_tensor"])
                 run_explanation(device,st.session_state["img_tensor"])
+                st.toast("Prediciton Complete", icon="😍")
             else:
                 st.warning("Please train the model first.")
         else:
