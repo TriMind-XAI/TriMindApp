@@ -44,7 +44,7 @@ def render_prediction_page_image():
     if "img_tensor" not in st.session_state:
         st.session_state["img_tensor"]=None
     device=st.session_state["device"]
-    if st.button("Pick Random Sample"):
+    if st.button("Pick Random Sample",type="primary"):
         test_loader = st.session_state["test_dataset"]
 
         images, labels = next(iter(test_loader))
@@ -90,7 +90,9 @@ def render_prediction_page_image():
         if st.session_state["true_label"] == "?":
             pass
         else:
-            st.subheader(f"This should be {st.session_state['true_label']}")
+            st.markdown(f"""
+                <div style="font-size:24px;font-weight:700"> This should be <span style="color:#22D3EE">{st.session_state['true_label']}</span></div>
+                """,unsafe_allow_html=True)
         st.image(st.session_state["img_display"], width=200)
 
     if st.button("Predict"):

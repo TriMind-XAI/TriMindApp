@@ -43,3 +43,17 @@ def get_tabular_class_name(class_idx):
         return str(class_idx)
 
     return labels.get(class_idx, str(class_idx))
+def get_icon_title(title,icon):
+    html=f"""
+    <div style="display: flex; align-items: center; gap: 8px;">
+        <div style="display:inline-block;">
+            <img src="data:image/png;base64,{icon}" 
+                width="24" 
+                style="filter: brightness(0) saturate(100%) invert(72%) sepia(36%) saturate(746%) hue-rotate(155deg) brightness(101%) contrast(101%);">
+        </div>
+        <span style="font-size:22px; font-weight:600;">
+            {title}
+        </span>
+    </div>
+    """
+    return html

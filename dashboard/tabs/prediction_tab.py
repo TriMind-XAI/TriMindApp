@@ -40,7 +40,7 @@ def run_tabular_prediction(sample):
         st.subheader(f"Confidence: {abs(prob*100)}%")
 
 def render_prediction_page_tabular():
-    if st.button("Pick Random Sample"):
+    if st.button("Pick Random Sample",type="primary"):
         X_test = st.session_state["test_x"]
         y_test = st.session_state["test_y"]
 

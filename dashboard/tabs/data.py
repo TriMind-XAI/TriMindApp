@@ -174,7 +174,7 @@ def render_tabular_data():
 
 def render_data_page():
 
-    st.header("Dataset Selection")
+    # st.header("Dataset Selection")
     data_type = st.selectbox(
         "Select data type",
         ["Image data", "Tabular data"]

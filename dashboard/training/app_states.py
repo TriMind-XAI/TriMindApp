@@ -1,6 +1,7 @@
 import streamlit as st
-def init_session_state():
+import torch
 
+def init_session_state():
     defaults = {
         "accuracy": None,
         "report": None,
@@ -25,7 +26,10 @@ def init_session_state():
         "image_exp_results":None,
         "tabular_results":None,
         "tabular_shap_values":None,
-        "data_type": "Image data"
+        "data_type": "Image data",
+        "device" : torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu"
+        )
     }
 
     for key, value in defaults.items():
