@@ -1,4 +1,4 @@
-from XAI.tabular_xai import explain_with_shap
+from XAI.tabular_xai import explain_with_shap, extract_cf_changes, generate_counterfactuals
 import streamlit as st
 import torch
 import random
@@ -80,5 +80,9 @@ def render_prediction_page_tabular():
             run_tabular_prediction(sample)
             with st.spinner("🔍 Generating SHAP explanations..."):
                 explain_with_shap(sample)
+                cf_df = generate_counterfactuals(st.session_state["model"], st.session_state["train_x"], st.session_state["train_y"], sample_df, num_cfs=1)
+                cf_changes = extract_cf_changes(sample_df, cf_df)
+                print("||||cf_changes||||", cf_changes)
+                st.session_state["cf_changes"]= cf_changes
                 st.toast("Prediciton Complete", icon="😍")
             

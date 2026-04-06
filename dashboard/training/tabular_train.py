@@ -3,11 +3,11 @@ import streamlit as st
 
 from training.training_mlp import train_mlp
 from models.tabular_models.ml_models import get_model
-
 from sklearn.metrics import (
     accuracy_score,
     classification_report
 )
+
 
 def train_and_evaluate(model_name):
     print(f"\nTraining {model_name}...\n")

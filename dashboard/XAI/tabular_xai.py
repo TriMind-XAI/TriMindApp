@@ -6,8 +6,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import json
+import dice_ml
 
-from utils import get_tabular_class_name
+from utils import TorchModelWrapper, get_tabular_class_name
 
 def explain_with_shap(sample):
     
@@ -100,7 +101,56 @@ def explain_with_shap(sample):
 
     fig = plt.gcf()
     st.pyplot(fig)
+
     
+def generate_counterfactuals(model, X_train, y_train, sample_df, num_cfs=1):
+    
+    X_train = pd.DataFrame(X_train, columns=sample_df.columns)
+    df = X_train.copy()
+    df["target"] =np.array(y_train)
+
+    dice_data = dice_ml.Data(
+        dataframe=df,
+        continuous_features=list(X_train.columns),
+        outcome_name="target"
+    )
+    if st.session_state["model_name"] == "MLP":
+        wrapped_model = TorchModelWrapper(model)
+        dice_model = dice_ml.Model(model=wrapped_model, backend="sklearn")
+    else:
+        dice_model = dice_ml.Model(model=model, backend="sklearn")
+    dice = dice_ml.Dice(dice_data, dice_model)
+
+    cf = dice.generate_counterfactuals(
+        sample_df,
+        total_CFs=num_cfs,
+        desired_class="opposite"
+    )
+
+    return cf.cf_examples_list[0].final_cfs_df
+
+def extract_cf_changes(sample_df, cf_df):
+
+    original = sample_df.iloc[0]
+    changes_all = []
+
+    for _, row in cf_df.iterrows():
+        changes = {}
+
+        for col in sample_df.columns:
+            orig = float(original[col])
+            new = float(row[col])
+
+            if abs(orig - new) > 1e-3:
+                changes[col] = {
+                    "from": round(orig, 3),
+                    "to": round(new, 3),
+                    "delta": round(new - orig, 3)
+                }
+
+        changes_all.append(changes)
+
+    return changes_all
 
 def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
 
@@ -114,7 +164,10 @@ def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
         "mean concavity": "irregularity of tumor shape",
         "mean concave points": "number of inward curves in tumor boundary",
         "smoothness error": "variation in surface smoothness",
-        "compactness error": "density and compactness variation"
+        "compactness error": "density and compactness variation",
+        "concave points": "sharp edges",
+        "symmetry": "cell symmetry",
+        "fractal dimension": "boundary complexity"
     }
     features = []
 
@@ -163,8 +216,10 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
         "diagnosis": pred_class,
         "confidence": f"{results['confidence']:.2%}",
         "supporting_features": positive,
-        "contradicting_features": negative
+        "contradicting_features": negative,
+        "counterfactuals":st.session_state["cf_changes"]
     }
+    # this is the bug , I didnt give context to positive and negative just values
     user_message = f"""
     DATA TO ANALYZE:
     {json.dumps(context_data, indent=2)}
@@ -182,6 +237,8 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
     - The "value" is the feature value, NOT the effect direction.
     - The "effect" determines whether it increases of positive value or decreases if it's negative prediction.
     - Do not infer direction from the value.
+    - from counterfactuals, explain what minimal changes would alter the prediction and Highlight the most sensitive features
+    - Use the counterfactuals to describe how stable or fragile the prediction is
     """
     personas = {
         'Clinician': (
@@ -209,5 +266,6 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
         max_tokens=400,
         temperature=0.5,
     )
+    print("message content:",response.choices[0].message.content)
 
     return response.choices[0].message.content

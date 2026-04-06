@@ -1,4 +1,7 @@
 import streamlit as st
+import torch
+import numpy as np 
+
 def apply_theme(dark_mode):
     if dark_mode:
         st.markdown("""
@@ -24,6 +27,22 @@ def apply_theme(dark_mode):
                 }
             </style>
         """, unsafe_allow_html=True)
+class TorchModelWrapper:
+    def __init__(self, model):
+        self.model = model
+        self.model.eval()
+
+    def predict_proba(self, X):
+        X_tensor = torch.FloatTensor(X)
+
+        with torch.no_grad():
+            output = self.model(X_tensor).squeeze()
+            probs = torch.sigmoid(output).numpy()
+
+        # convert to sklearn format [prob_0, prob_1]
+        probs = np.vstack([1 - probs, probs]).T
+        return probs
+
 def get_class_name(class_idx):
 
     labels = st.session_state.get("class_names")
