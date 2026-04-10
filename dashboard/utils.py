@@ -27,19 +27,22 @@ def apply_theme(dark_mode):
                 }
             </style>
         """, unsafe_allow_html=True)
+
 class TorchModelWrapper:
     def __init__(self, model):
         self.model = model
         self.model.eval()
 
     def predict_proba(self, X):
+        if hasattr(X, "values"):
+            X = X.values
+
         X_tensor = torch.FloatTensor(X)
 
         with torch.no_grad():
             output = self.model(X_tensor).squeeze()
-            probs = torch.sigmoid(output).numpy()
+            probs = torch.sigmoid(output).cpu().numpy()
 
-        # convert to sklearn format [prob_0, prob_1]
         probs = np.vstack([1 - probs, probs]).T
         return probs
 

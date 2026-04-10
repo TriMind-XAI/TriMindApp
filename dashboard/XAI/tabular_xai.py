@@ -131,24 +131,43 @@ def generate_counterfactuals(model, X_train, y_train, sample_df, num_cfs=1):
 
 def extract_cf_changes(sample_df, cf_df):
 
+    import numpy as np
+
     original = sample_df.iloc[0]
     changes_all = []
 
     for _, row in cf_df.iterrows():
         changes = {}
 
+        deltas = []
+
         for col in sample_df.columns:
             orig = float(original[col])
             new = float(row[col])
+            delta = new - orig
 
-            if abs(orig - new) > 1e-3:
+            if abs(delta) > 1e-3:
                 changes[col] = {
-                    "from": round(orig, 3),
-                    "to": round(new, 3),
-                    "delta": round(new - orig, 3)
+                    "direction": "increase" if delta > 0 else "decrease",
+                    "to": round(new, 2)
                 }
+                deltas.append(abs(delta))
 
-        changes_all.append(changes)
+        # compute stability
+        num_features = len(changes)
+        avg_change = np.mean(deltas) if deltas else 0
+        if num_features <= 2 and avg_change < 1:
+            stability = "sensitive"
+        else:
+            stability = "stable"
+
+        changes_all.append({
+            "features_changed": list(changes.keys()),
+            "directions": changes,
+            "num_features_changed": num_features,
+            "avg_change": round(avg_change, 3),
+            "stability": stability
+        })
 
     return changes_all
 
@@ -225,20 +244,22 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
     {json.dumps(context_data, indent=2)}
 
     INSTRUCTIONS:
+    first paragraph:
     - Explain which features MOST influenced the prediction.
-    - Highlight features that increased the likelihood of the diagnosis.
-    - Highlight features that decreased it.
+    - Highlight features that increased or decreased the likelihood of the diagnosis.
     - Use feature names and their values in your explanation.
     - keep numbers short and readable 
     - Avoid repeating feature names unnecessarily
-    - Keep response to 2 short paragraphs.
     - Do NOT infer medical meaning beyond given data
     - Only describe statistical influence of features
-    - The "value" is the feature value, NOT the effect direction.
     - The "effect" determines whether it increases of positive value or decreases if it's negative prediction.
     - Do not infer direction from the value.
-    - from counterfactuals, explain what minimal changes would alter the prediction and Highlight the most sensitive features
-    - Use the counterfactuals to describe how stable or fragile the prediction is
+    second short paragraph: 
+    - Using counterfactuals, state which features would need to change to alter the prediction.
+    - Include the target values (rounded to 2 decimals) that will alter the prediction for these features.
+    - Do not include all values, only the most important 1–2 features.
+    - Use the provided stability indicator(e.g, avg_change, directions) to describe whether the prediction is sensitive or stable.
+    - Keep this paragraph 2 sentences maximum.
     """
     personas = {
         'Clinician': (
@@ -253,11 +274,12 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
             "comment on reliability based only on the provided data."
         ),
         'Patient': (
-            "You are a doctor explaining breast cancer prediction results to a patient. "
-            "Translate technical features into simple ideas like size, shape, or texture, "
+            "You are a doctor explaining breast cancer prediction results to a patient."
+            "Don't use techicanl terms, Translate technical features into simple ideas like size, shape, or texture, "
             "and focus only on the most important factors in a reassuring way."
         ),
     }
+    print("user_message", user_message)
     response = client.chat_completion(
         messages=[
             {"role": "system", "content": personas[audience]},
@@ -266,6 +288,5 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
         max_tokens=400,
         temperature=0.5,
     )
-    print("message content:",response.choices[0].message.content)
 
     return response.choices[0].message.content

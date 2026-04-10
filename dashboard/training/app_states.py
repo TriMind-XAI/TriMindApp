@@ -25,9 +25,11 @@ def init_session_state():
         "consistency":None,
         "image_exp_results":None,
         "tabular_results":None,
+        "shap_ready":False,
         "tabular_shap_values":None,
         "cf_changes":None,
         "data_type": "Image data",
+        "loading":False,
         "device" : torch.device(
             "cuda" if torch.cuda.is_available() else "cpu"
         )

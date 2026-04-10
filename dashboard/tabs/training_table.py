@@ -18,7 +18,7 @@ def render_training_page_tabular():
             accuracy,report= train_and_evaluate(model_option)
             st.session_state["accuracy"] = accuracy
             st.session_state["report"] = report
-            st.toast("Training Complete", icon="😍")
+            st.toast("Training Complete", icon="✅")
         if model_option =="MLP":
             metrics_df = pd.DataFrame({
             "Epoch": range(1, len(report["accuracy"]) + 1),
@@ -68,6 +68,5 @@ def render_training_page_tabular():
         )
         st.subheader("Classification Report")
         st.text(st.session_state["report"])
-
 
 

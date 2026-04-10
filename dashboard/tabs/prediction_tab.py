@@ -37,7 +37,7 @@ def run_tabular_prediction(sample):
         st.error(f"Prediction: {label}")
 
     if prob is not None:
-        st.subheader(f"Confidence: {abs(prob*100)}%")
+        st.subheader(f"Confidence: {abs(prob*100):.2f}%")
 
 def render_prediction_page_tabular():
     if st.button("Pick Random Sample",type="primary"):
@@ -82,7 +82,6 @@ def render_prediction_page_tabular():
                 explain_with_shap(sample)
                 cf_df = generate_counterfactuals(st.session_state["model"], st.session_state["train_x"], st.session_state["train_y"], sample_df, num_cfs=1)
                 cf_changes = extract_cf_changes(sample_df, cf_df)
-                print("||||cf_changes||||", cf_changes)
                 st.session_state["cf_changes"]= cf_changes
-                st.toast("Prediciton Complete", icon="😍")
+            st.toast("Prediciton Complete", icon="✅")
             

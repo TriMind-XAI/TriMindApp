@@ -38,7 +38,7 @@ def render_training_page_image():
                 progress_bar,
                 int(epochs)
             )
-            st.toast("Training Complete", icon="😍")
+            st.toast("Training Complete", icon="✅")
             progress_bar.empty()
         # st.progress_bar("Training complete!")
         metrics_df = pd.DataFrame({

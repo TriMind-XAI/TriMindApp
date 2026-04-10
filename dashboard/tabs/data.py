@@ -18,10 +18,12 @@ def get_available_medmnist():
     ]
 @st.cache_resource
 def load_medmnist(dataset_name, size=28, transform=None,batch=64):
-    root = os.path.expanduser("~/.medmnist")
-    download_flag = not os.path.exists(root)
-    download_flag = True
-    print("download_flag",download_flag)
+    BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+    root = os.path.join(BASE_DIR, "data", "medmnist")
+    os.makedirs(root, exist_ok=True)
+
+    dataset_file = os.path.join(root, f"{dataset_name}.npz")
+    download_flag = not os.path.exists(dataset_file)
 
     DataClass = getattr(medmnist, INFO[dataset_name]['python_class'])
     
@@ -33,13 +35,15 @@ def load_medmnist(dataset_name, size=28, transform=None,batch=64):
         split='train',
         download=download_flag,
         size=size,
-        transform=transform
+        transform=transform,
+        root=root
     )
 
     test = DataClass(
         split='test',
         download=download_flag,
         size=size,
+        root=root,
         transform=transform
     )
 
