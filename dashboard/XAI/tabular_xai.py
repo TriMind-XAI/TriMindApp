@@ -4,10 +4,10 @@ import torch
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-
 import json
 import dice_ml
 
+from XAI.instructions import personas,instructions
 from utils import TorchModelWrapper, get_tabular_class_name
 
 def explain_with_shap(sample):
@@ -165,11 +165,21 @@ def extract_cf_changes(sample_df, cf_df):
             "features_changed": list(changes.keys()),
             "directions": changes,
             "num_features_changed": num_features,
-            "avg_change": round(avg_change, 3),
+            # "avg_change": round(avg_change, 3),
             "stability": stability
         })
 
     return changes_all
+
+# def get_importance_label(p):
+#     if p > 50:
+#         return "very high"
+#     elif p > 30:
+#         return "high"
+#     elif p > 10:
+#         return "moderate"
+#     else:
+#         return "low"
 
 def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
 
@@ -191,14 +201,15 @@ def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
     features = []
 
     features_name_list=feature_names.columns.tolist()
+    total = np.sum(np.abs(shap_values)) + 1e-8
+
     for i in range(len(features_name_list)):
         name = features_name_list[i]
         # translate techinical names
         if name in feature_descriptions:
             name = f"{name} ({feature_descriptions[name]})"
-        # importance
-        total = np.sum(np.abs(shap_values))
         importance = abs(shap_values[i]) / total
+        # importance_pct = abs(shap_values[i]) / total * 100
         # explain effect if its positive or negative  
         effect=""
         if shap_values[i] > 0:
@@ -207,16 +218,18 @@ def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
             effect = "decreases"
         else:
             effect = "no effect"
+
         features.append({
             "feature": name,
             "value": round(float(sample[i]),2),
             "impact": round(float(shap_values[i]),2),
+            "effect":effect,
             "importance": round(importance*100, 1),
-            "effect":effect
+            # "importance_percentage": round(float(importance_pct), 1),
+            # "importance_label": get_importance_label(importance_pct)
         })
     # Sort by importance
     features = sorted(features, key=lambda x: abs(x["impact"]), reverse=True)
-
     top_features = features[:top_k]
 
     # Split positive vs negative
@@ -238,47 +251,15 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
         "contradicting_features": negative,
         "counterfactuals":st.session_state["cf_changes"]
     }
-    # this is the bug , I didnt give context to positive and negative just values
+    # - Use feature names and their values in your explanation.
+
     user_message = f"""
     DATA TO ANALYZE:
     {json.dumps(context_data, indent=2)}
 
     INSTRUCTIONS:
-    first paragraph:
-    - Explain which features MOST influenced the prediction.
-    - Highlight features that increased or decreased the likelihood of the diagnosis.
-    - Use feature names and their values in your explanation.
-    - keep numbers short and readable 
-    - Avoid repeating feature names unnecessarily
-    - Do NOT infer medical meaning beyond given data
-    - Only describe statistical influence of features
-    - The "effect" determines whether it increases of positive value or decreases if it's negative prediction.
-    - Do not infer direction from the value.
-    second short paragraph: 
-    - Using counterfactuals, state which features would need to change to alter the prediction.
-    - Include the target values (rounded to 2 decimals) that will alter the prediction for these features.
-    - Do not include all values, only the most important 1–2 features.
-    - Use the provided stability indicator(e.g, avg_change, directions) to describe whether the prediction is sensitive or stable.
-    - Keep this paragraph 2 sentences maximum.
+    {instructions[audience]}
     """
-    personas = {
-        'Clinician': (
-            "You are a clinical expert analyzing breast cancer prediction results "
-            "based on extracted tumor features (e.g., size, shape, texture). "
-            "Explain how these features influence the prediction without making unsupported medical conclusions."
-        ),
-        'Researcher':(
-            "You are an AI auditor evaluating a breast cancer prediction model. "
-            "Analyze how feature importance affects the prediction, discuss whether the decision is dominated "
-            "potential bias based only on the provided feature contributions,"
-            "comment on reliability based only on the provided data."
-        ),
-        'Patient': (
-            "You are a doctor explaining breast cancer prediction results to a patient."
-            "Don't use techicanl terms, Translate technical features into simple ideas like size, shape, or texture, "
-            "and focus only on the most important factors in a reassuring way."
-        ),
-    }
     print("user_message", user_message)
     response = client.chat_completion(
         messages=[
@@ -286,7 +267,7 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
             {"role": "user", "content": user_message}
         ],
         max_tokens=400,
-        temperature=0.5,
+        temperature=0.2,
     )
 
     return response.choices[0].message.content

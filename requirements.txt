@@ -1,0 +1,16 @@
+altair==6.0.0
+captum==0.8.0
+dice_ml==0.12
+extra_streamlit_components==0.1.81
+huggingface_hub==0.36.0
+matplotlib==3.10.8
+numpy==2.4.4
+pandas==3.0.2
+Pillow==12.2.0
+scikit_learn==1.8.0
+scipy==1.17.1
+shap==0.51.0
+streamlit==1.54.0
+torch==2.7.1+cu118
+torchvision==0.22.1+cu118
+xgboost==3.2.0
