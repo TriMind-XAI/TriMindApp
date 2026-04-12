@@ -206,8 +206,6 @@ def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
     for i in range(len(features_name_list)):
         name = features_name_list[i]
         # translate techinical names
-        if name in feature_descriptions:
-            name = f"{name} ({feature_descriptions[name]})"
         importance = abs(shap_values[i]) / total
         # importance_pct = abs(shap_values[i]) / total * 100
         # explain effect if its positive or negative  
@@ -220,7 +218,8 @@ def summarize_shap_tabular(shap_values, sample, feature_names, top_k=5):
             effect = "no effect"
 
         features.append({
-            "feature": name,
+            "feature_name": name,
+            "feature_readable": feature_descriptions.get(name, None),
             "value": round(float(sample[i]),2),
             "impact": round(float(shap_values[i]),2),
             "effect":effect,
