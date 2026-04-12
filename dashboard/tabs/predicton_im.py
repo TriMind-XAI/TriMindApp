@@ -3,14 +3,15 @@ import random
 import torch
 from PIL import Image
 from torchvision import transforms
-
+import torch.nn.functional as F
 from XAI.image_xai import MultiviewExplainer, analyze_consistency
 def run_prediction(img_tensor):
     st.session_state["model"].eval()
-    print("run_prediction")
     with torch.no_grad():
         outputs = st.session_state["model"](img_tensor)
-        _, predicted = torch.max(outputs,1)
+        
+        probs = F.softmax(outputs, dim=1)
+        confidence, predicted = torch.max(probs, 1)
 
     class_names = st.session_state["train_dataset"].dataset.info["label"]
 
@@ -18,6 +19,7 @@ def run_prediction(img_tensor):
 
     st.subheader("Prediction Result")
     st.success(pred_class)
+    st.subheader(f"Confidence: {abs(confidence.item()*100):.2f}%")
 
 def run_explanation(device,sample_image):
     # Create explainer

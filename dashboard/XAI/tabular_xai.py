@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import json
 import dice_ml
 
-from XAI.instructions import personas,instructions
+from XAI.instructions import personas_tabular,instructions_tabular
 from utils import TorchModelWrapper, get_tabular_class_name
 
 def explain_with_shap(sample):
@@ -257,12 +257,12 @@ def convert_to_llm(client,shap_values,sample,results,audience="clinician"):
     {json.dumps(context_data, indent=2)}
 
     INSTRUCTIONS:
-    {instructions[audience]}
+    {instructions_tabular[audience]}
     """
     print("user_message", user_message)
     response = client.chat_completion(
         messages=[
-            {"role": "system", "content": personas[audience]},
+            {"role": "system", "content": personas_tabular[audience]},
             {"role": "user", "content": user_message}
         ],
         max_tokens=400,

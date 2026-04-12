@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy.stats import spearmanr
 import os
 import json
-
+from XAI.instructions import get_persona_image,instructions_image
 from utils import get_class_name
 
 
@@ -181,16 +181,28 @@ def compute_attention_strength(attr):
     return round(float(np.mean(np.abs(attr))), 3)
 
 def compute_focus_type(region_scores):
-
-    top = region_scores[0]["importance"]
-    if top > 0.7:
+    if len(region_scores) < 2:
         return "highly focused"
-    elif top > 0.5:
+
+    top1 = region_scores[0]["importance"]
+    top2 = region_scores[1]["importance"]
+    ratio = top1 / (top2 + 1e-6)
+
+    if ratio > 2.5:
+        return "highly focused"
+    elif ratio > 1.5:
         return "moderately focused"
-    elif top > 0.3:
+    elif ratio > 1.1:
         return "slightly focused"
     else:
         return "diffuse"
+def get_attention_level(strength):
+    if strength > 0.2:
+        return "strong"
+    elif strength > 0.08:
+        return "moderate"
+    else:
+        return "weak"
         
 def generate_narrative_hf(client, results, consistency_metrics, audience='Clinician'):
     pred_class = get_class_name(results["prediction"])
@@ -205,53 +217,27 @@ def generate_narrative_hf(client, results, consistency_metrics, audience='Clinic
         "attention": {
             "top_regions_pecsentage": regions[:2],
             "focus_type": focus_type,
-            "strength": attention_strength
+            "strength": attention_strength,
+            "strength_level": get_attention_level(attention_strength)
         }
     }
 
-    personas = {
-        'Clinician': (
-            f"You are a Radiologist analysing {st.session_state['selected_dataset']} classification results."
-            "Write a brief clinical finding report using appropriate clinical language when supported by the data"
-            "Describe which parts of the image influenced the prediction and how strongly they contributed."
-        ),
-        'Researcher': (
-            f"You are an AI auditor evaluating a {st.session_state['selected_dataset']} image classification model. "
-            "Analyze which regions influenced the prediction, assess attention strength, "
-            "and discuss reliability based only on the provided data."
-        ),
-        'Patient': (
-            f"You are a doctor explaining {st.session_state['selected_dataset']} image classificaiton results to a patient."
-            "Explain the results simply, avoid jargon, and be reassuring."
-        )
-    }
-
-
+    personas = get_persona_image(st.session_state['selected_dataset'])
     user_message = f"""
         DATA TO ANALYZE:
         {json.dumps(context_data, indent=2)}
 
         INSTRUCTIONS:
-        - Reference the confidence score and XAI consistency.
-        - If consistency > 0.6, state that the explanation is reliable.
-        - If consistency is low, mention possible uncertainty.
-        - Use GradCAM as the primary source for localization (where the model focused).
-        - Explain which regions of the image MOST influenced the prediction.
-        - Refer to attention strength and whether it is concentrated or spread out.
-        - Mention attention pattern only once clearly.
-        - Use "focus_type" to describe attention (e.g., diffuse, concentrated).
-        - Focus only on what the model used to make the decision.
-        - Avoid repeating the same concept multiple times.
-        - Do NOT make unsupported medical diagnoses.
-        - Keep response to 2 short paragraphs.
+        {instructions_image[audience]}
     """
     response = client.chat_completion(
         messages=[
             {"role": "system", "content":  personas[audience]},
             {"role": "user", "content": user_message}
         ],
-        max_tokens=400,
-        temperature=0.5,
+        max_tokens=300,
+        temperature=0.2,
     )
+    print(user_message)
 
     return response.choices[0].message.content

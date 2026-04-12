@@ -1,12 +1,7 @@
 
-import time
-start = time.time()
-# your imports...
 import streamlit as st
 import extra_streamlit_components as stx
 from training.app_states import init_session_state
-# from utils import apply_theme
-from tabs.compare import render_compare_page
 from components.sidebar import render_sidebar
 
 # print("After imports:", time.time() - start)
@@ -43,7 +38,7 @@ st.set_page_config(
     layout="wide"
 )
 
-steps_names=["Data", "Train", "Predict", "Explain","Compare"]
+steps_names=["Data", "Train", "Predict", "Explain"]
 stx.stepper_bar(
     steps=steps_names,
     default=st.session_state.step,
@@ -59,8 +54,8 @@ with col1:
             st.session_state.loading = True
             st.rerun()
 with col2:
-    if st.button("Next →", disabled=st.session_state.step == 4):
-        if st.session_state.step <4:
+    if st.button("Next →", disabled=st.session_state.step == 3):
+        if st.session_state.step <3:
             st.session_state.step += 1
             st.session_state.loading = True
             st.rerun()
@@ -94,8 +89,3 @@ elif st.session_state.step==3:
     else:
         from tabs.explain import render_explanation_page_tabular
         render_explanation_page_tabular()
-elif st.session_state.step==4:
-    print("rendering compare")
-    render_compare_page()
-
-# print("After app.py:", time.time() - start)
