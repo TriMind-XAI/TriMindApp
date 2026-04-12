@@ -21,9 +21,9 @@ class SmallCNN(nn.Module):
         return x
 
 
-class BetterCNN(nn.Module):
+class DropOutCNN(nn.Module):
     def __init__(self, in_channels=1, num_classes=2):
-        super(BetterCNN, self).__init__()
+        super(DropOutCNN, self).__init__()
 
         self.conv1 = nn.Conv2d(in_channels, 16, kernel_size=3, padding=1)
         self.bn1 = nn.BatchNorm2d(16)

@@ -3,28 +3,44 @@ import torch
 from models.image_models import resnet,simple_cnn
 from training.image_train import train_loop
 import altair as alt
+import time
 import pandas as pd
 
 def render_training_page_image():
     model_option = st.selectbox(
         "Select Model",
-        ["SmallCNN","ResNet-8", "Pretrained Medical Model"]
+        ["ResNet-8⭐","SmallCNN","DropOutCNN", "Pretrained Medical Model"]
     )
+    epochs = st.selectbox(
+        "Select Epochs",
+        ["5","10","15","20","30"]
+    )
+    st.session_state["model_name"]=model_option
+    st.session_state["accuracy"] = None
+    st.session_state["metrics_df"] = None
     model=None
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    if model_option is "SmallCNN":
-        model=simple_cnn.SmallCNN(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
-    if model_option is "ResNet-8":
+    device = st.session_state["device"]
+    if model_option == "ResNet-8⭐":
         model=resnet.ResNet8(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
+    if model_option == "SmallCNN":
+        model=simple_cnn.SmallCNN(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
+    if model_option == "DropOutCNN":
+        model=simple_cnn.DropOutCNN(num_classes=st.session_state["num_classes"],in_channels=st.session_state["in_channels"]).to(device)
     
     if st.button("Train Model"):
+        st.session_state.pop("explainer", None)
         with st.spinner("Training model... Please wait ⏳"):
+            progress_bar = st.progress(0)
             train_accuracies, test_accuracies = train_loop(
                 model,
                 st.session_state["train_dataset"],
                 st.session_state["test_dataset"],
-                15
+                progress_bar,
+                int(epochs)
             )
+            st.toast("Training Complete", icon="✅")
+            progress_bar.empty()
+        # st.progress_bar("Training complete!")
         metrics_df = pd.DataFrame({
         "Epoch": range(1, len(train_accuracies) + 1),
         "Train Accuracy": train_accuracies,
@@ -32,8 +48,9 @@ def render_training_page_image():
         })
 
         st.session_state["metrics_df"] = metrics_df
+        st.session_state["model"]=model 
 
-    if "metrics_df" in st.session_state:
+    if st.session_state["metrics_df"] is not None:
         
         df = st.session_state["metrics_df"]
 
@@ -53,4 +70,4 @@ def render_training_page_image():
             title="Training vs Test Accuracy"
         )
 
-        st.altair_chart(accuracy_chart, use_container_width=True)
+        st.altair_chart(accuracy_chart, width="stretch")
