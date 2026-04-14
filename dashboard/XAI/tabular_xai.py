@@ -131,8 +131,6 @@ def generate_counterfactuals(model, X_train, y_train, sample_df, num_cfs=1):
 
 def extract_cf_changes(sample_df, cf_df):
 
-    import numpy as np
-
     original = sample_df.iloc[0]
     changes_all = []
 
