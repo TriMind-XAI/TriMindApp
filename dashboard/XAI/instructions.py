@@ -48,8 +48,8 @@ instructions_tabular={
             1) which features need to change
             2) whether prediction is stable or not (by using the "stability" value).
         - Do not include all values, only the most important 1–2 features.
+        Overall Rules:
         - Put the header of the paragraph.
-        Rules:
         - Do NOT explain all features (2-3 max).
         - Do NOT repeat the same idea.
         - Do NOT add extra analysis or discussion.
