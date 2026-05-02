@@ -6,6 +6,10 @@ def render_sidebar():
     logo_path = os.path.join(BASE_DIR, "assets/logo.png")
     st.sidebar.image(logo_path,width='content')
     st.sidebar.divider()
+    if st.sidebar.button("Logout"):
+        st.session_state.clear()   
+        st.rerun()
+    st.sidebar.divider()
     if st.session_state.step==0:
         data_sidebar()
     elif st.session_state.step==1:
