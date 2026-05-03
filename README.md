@@ -58,6 +58,9 @@ pip install -r requirements.txt
 #  use Hugging Face token
 echo "HUGGINGFACE_TOKEN=your-token-here" >> .env
 ```
+##  Project Structure
+<img width="352" height="829" alt="trimind_folder_structure" src="https://github.com/user-attachments/assets/c4ed5d1e-68f2-4778-9c9b-f8f331b5a02e" />
+
 
 ### Running the Application
 
@@ -65,28 +68,99 @@ echo "HUGGINGFACE_TOKEN=your-token-here" >> .env
 ```bash
 streamlit run dashboard/app.py
 ```
-Navigate to `http://localhost:8501` in your browser.
 
 **Option 2: 
 ```bash
 python -m streamlit run dashboard/app.py
 ```
 
+Navigate to `http://localhost:8501` in your browser.
 
-##  Project Structure
-<img width="352" height="829" alt="trimind_folder_structure" src="https://github.com/user-attachments/assets/c4ed5d1e-68f2-4778-9c9b-f8f331b5a02e" />
+##  Step-by-Step User Guide
+
+### Login(authentication)
+You can either register newly or login through google
+<img width="1132" height="754" alt="login" src="https://github.com/user-attachments/assets/a3fad640-0003-47ee-b3ac-fe18ace2837e" />
+
+### Step 1: Select Data Type
+
+When you first launch the application, you'll see the data selection interface.
+
+<img width="1165" height="593" alt="first_select_data" src="https://github.com/user-attachments/assets/e85e98b0-2a62-4bfa-8ff1-e129faf3e1f8" />
+
+
+**Choose your data type:**
+
+#### **Option A: Tabular Data**
+- For structured medical records (Wisconsin Breast Cancer dataset)
+- Features: numerical measurements, lab values
+- Best for: MLP neural networks, XGBoost models
+
+#### **Option B: Image Data**
+- For medical imaging (Chest X-rays, MRI, CT scans)
+- Formats: PNG, JPG, JPEG
+- Best for: CNN, ResNet architectures
+
+**How to Select:**
+- Click on the "Data" tab in the sidebar
+- Choose "Tabular" or "Image" from the dropdown
+- Upload your dataset or use pre-loaded samples (PneumoniaMNIST, BreastMNIST)
+
+
+**What Happens:**
+- System automatically configures appropriate preprocessing
+- Displays data preview and statistics
+- Suggests compatible model architectures
+
+---
+
+### Step 2: Train the Model
+
+After selecting your data, navigate to the Training tab to build your AI model.
+
+<img width="1172" height="587" alt="second_train_model" src="https://github.com/user-attachments/assets/8d46148c-b8ca-4ea8-b3a6-8b3221d7bb6a" />
+
+
+### Step 3: Predict & Analyze with XAI
+
+Now that your model is trained, make predictions on new images.
+
+<img width="1174" height="581" alt="third_predict" src="https://github.com/user-attachments/assets/5cff6eda-7c31-47fd-94cf-3fedfd1f4008" />
+
+
+---
+
+### Step 4: Get LLM Persona Explanations
+
+Transform technical XAI results into natural language narratives for different audiences.
+
+<img width="1185" height="588" alt="fourth_explain" src="https://github.com/user-attachments/assets/97e3344f-8168-41c9-bcad-3f76a094dbc3" />
+
+
+#### **Three Persona Options:**
+
+### **Persona 1:  Clinician**
+
+**Target Audience:** Doctors, Radiologists, Medical Professionals
+
+
+### **Persona 2:  Patient**
+
+**Target Audience:** Patients, Family Members, Non-Medical Individuals
+
+
+### **Persona 3:  Researcher**
+
+**Target Audience:** AI Researchers, Data Scientists, ML Engineers, Auditors
 
 
 
 
-
-
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **MedMNIST**: For providing standardized medical imaging datasets
 - **Wisconsin**: For providing standardized medical imaging datasets
 - **Captum**: Facebook's XAI library
 - **Ollama**: Llama API for narrative generation
 - **Hugging Face**: Open-source LLM infrastructure
-
+- **Kapcia, M., Eshkiki, H., Duell, J., Fan, X., Zhou, S., & Mora, B. (n.d.). ExMed**: An AI tool for experimenting explainable AI techniques on medical data analytics
