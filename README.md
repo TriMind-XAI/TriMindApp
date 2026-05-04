@@ -173,6 +173,8 @@ Transform technical XAI results into natural language narratives for different a
 - Akinpelumi Ajayi
 - Amjad Alhaffar amjad.alhaffar.aa@gmail.com
 
-Supervisor: Dr. Jamie Duell
-University: Sheffield Hallam University
-<img width="850" height="566" alt="uni logo" src="https://github.com/user-attachments/assets/6a9dd6f2-756d-48b9-978b-20636fc2a57d" />
+**Supervisor: Dr. Jamie Duell**
+
+### Sheffield Hallam University
+
+<img width="280" height="188" alt="uni logo" src="https://github.com/user-attachments/assets/6a9dd6f2-756d-48b9-978b-20636fc2a57d" />
