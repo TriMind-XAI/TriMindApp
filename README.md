@@ -73,12 +73,12 @@ echo "HUGGINGFACE_TOKEN=your-token-here" >> .env
 ```
 ### Running the Application
 
-**Option 1: Streamlit Dashboard
+**Option 1:** Streamlit Dashboard
 ```bash
 streamlit run dashboard/app.py
 ```
 
-**Option 2: 
+**Option 2:** 
 ```bash
 python -m streamlit run dashboard/app.py
 ```
