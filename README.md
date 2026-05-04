@@ -13,6 +13,21 @@ A medical AI explanation tool that translates complex machine learning predictio
 - **LLM Narratives**: Audience-specific explanations (Clinician, Patient, Researcher)
 - **Interactive Dashboard**: Streamlit-based web interface
 
+## Important: Notebooks Folder
+**The Notebooks folder contains standalone experimental workflows used during development**
+They can be used to review individual parts of the project without running the full dashboard.
+**Used in the final project development**
+- notebooks/Pneumonia_MNIST.ipynb Image classification on PneumoniaMNIST dataset
+- notebooks/Image_medmnist_XAI.ipynb XAI and LLM implementaion for PneumoniaMNIST
+- notebooks/Tabular_shap.ipynb SHAP experiments for tabular data models training and XAI.
+- notebooks/Counterfactual_Shap_Tab.ipynb Tabular counterfactual and SHAP experiments.
+**Experimental / not included in the final system**
+- notebooks/3D_Image.ipynb Exploratory work with 3D image data.
+- notebooks/counterfactual_3D_image.ipynb Exploratory work with 3D image data Counterfactuals.
+Experimental attempt to apply counterfactual explanation ideas to 3D image data; not included due to scope and implementation limits.
+
+## System Workflow
+<img width="3026" height="164" alt="sys workflow" src="https://github.com/user-attachments/assets/24ed66cd-d949-48af-a273-fd4007727633" />
 
 ##  Quick Start
 
@@ -153,3 +168,11 @@ Transform technical XAI results into natural language narratives for different a
 - **Meta Llama**: Llama API for narrative generation
 - **Hugging Face**: Open-source LLM infrastructure
 - **Kapcia, M., Eshkiki, H., Duell, J., Fan, X., Zhou, S., & Mora, B. (n.d.). ExMed**: An AI tool for experimenting explainable AI techniques on medical data analytics
+## Contributors
+- Aderonke Adelabu
+- Akinpelumi Ajayi
+- Amjad Alhaffar amjad.alhaffar.aa@gmail.com
+
+Supervisor: Dr. Jamie Duell
+University: Sheffield Hallam University
+<img width="850" height="566" alt="uni logo" src="https://github.com/user-attachments/assets/6a9dd6f2-756d-48b9-978b-20636fc2a57d" />
