@@ -8,7 +8,7 @@ A medical AI explanation tool that translates complex machine learning predictio
 ##  Features
 
 - **Multiple AI Models**: ResNet8, Custom CNN architectures (image data), ML Models and MLP (tabular data)
-- **4 XAI Methods**: Integrated Gradients, GradCAM, Saliency Maps, GradientSHAP, SHAP, Counterfacuals
+- **6 XAI Methods**: Integrated Gradients, GradCAM, Saliency Maps, GradientSHAP, SHAP, Counterfacuals
 - **Consistency Analysis**: Cross-validation between explanation methods using Spearman
 - **LLM Narratives**: Audience-specific explanations (Clinician, Patient, Researcher)
 - **Interactive Dashboard**: Streamlit-based web interface
