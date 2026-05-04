@@ -1,5 +1,5 @@
 # TriMindApp - Developing a Multi-view XAI tool with LLM-driven narrative explanations
-[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.7.1-red.svg)](https://pytorch.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.54.0-FF4B4B.svg)](https://streamlit.io/)
 
@@ -9,8 +9,8 @@ A medical AI explanation tool that translates complex machine learning predictio
 
 ##  Features
 
-- **Multiple AI Models**: ResNet8, Custom CNN architectures 
-- **4 XAI Methods**: Integrated Gradients, GradCAM, Saliency Maps, GradientSHAP
+- **Multiple AI Models**: ResNet8, Custom CNN architectures (image data), ML Models and MLP (tabular data)
+- **4 XAI Methods**: Integrated Gradients, GradCAM, Saliency Maps, GradientSHAP, SHAP, Counterfacuals
 - **Consistency Analysis**: Cross-validation between explanation methods
 - **LLM Narratives**: Audience-specific explanations (Clinician, Patient, Researcher)
 - **Interactive Dashboard**: Streamlit-based web interface
@@ -20,7 +20,7 @@ A medical AI explanation tool that translates complex machine learning predictio
 
 ### Prerequisites
 
-- Python 3.9 or higher
+- Python 3.12 or higher
 - CUDA 11.8+ (optional, for GPU acceleration)
 - 8GB RAM minimum (16GB recommended)
 
@@ -28,7 +28,7 @@ A medical AI explanation tool that translates complex machine learning predictio
 
 1. **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/TriMindApp.git
+git clone https://github.com/TriMind-XAI/TriMindApp.git
 cd TriMindApp
 ```
 
@@ -58,10 +58,6 @@ pip install -r requirements.txt
 #  use Hugging Face token
 echo "HUGGINGFACE_TOKEN=your-token-here" >> .env
 ```
-##  Project Structure
-<img width="352" height="829" alt="trimind_folder_structure" src="https://github.com/user-attachments/assets/c4ed5d1e-68f2-4778-9c9b-f8f331b5a02e" />
-
-
 ### Running the Application
 
 **Option 1: Streamlit Dashboard
@@ -75,6 +71,7 @@ python -m streamlit run dashboard/app.py
 ```
 
 Navigate to `http://localhost:8501` in your browser.
+##  Project Structure
 
 ##  Step-by-Step User Guide
 
@@ -90,28 +87,20 @@ When you first launch the application, you'll see the data selection interface.
 
 
 **Choose your data type:**
-
-#### **Option A: Tabular Data**
-- For structured medical records (Wisconsin Breast Cancer dataset)
-- Features: numerical measurements, lab values
-- Best for: MLP neural networks, XGBoost models
-
-#### **Option B: Image Data**
-- For medical imaging (Chest X-rays, MRI, CT scans)
-- Formats: PNG, JPG, JPEG
-- Best for: CNN, ResNet architectures
-
-**How to Select:**
 - Click on the "Data" tab in the sidebar
 - Choose "Tabular" or "Image" from the dropdown
 - Upload your dataset or use pre-loaded samples (PneumoniaMNIST, BreastMNIST)
+- 
+#### **Option A: Tabular Data**
+- For structured medical records (Wisconsin Breast Cancer dataset)
 
+#### **Option B: Image Data**
+- For medical imaging (MedMnist datasets)
 
 **What Happens:**
 - System automatically configures appropriate preprocessing
 - Displays data preview and statistics
 - Suggests compatible model architectures
-
 ---
 
 ### Step 2: Train the Model
@@ -120,6 +109,9 @@ After selecting your data, navigate to the Training tab to build your AI model.
 
 <img width="1172" height="587" alt="second_train_model" src="https://github.com/user-attachments/assets/8d46148c-b8ca-4ea8-b3a6-8b3221d7bb6a" />
 
+**What Happens:**
+- Shows training progress
+- Displays the model performance results
 
 ### Step 3: Predict & Analyze with XAI
 
@@ -127,7 +119,9 @@ Now that your model is trained, make predictions on new images.
 
 <img width="1174" height="581" alt="third_predict" src="https://github.com/user-attachments/assets/5cff6eda-7c31-47fd-94cf-3fedfd1f4008" />
 
-
+**What Happens:**
+- Shows prediciton/expected results
+- Displays XAI technical results
 ---
 
 ### Step 4: Get LLM Persona Explanations
@@ -144,16 +138,13 @@ Transform technical XAI results into natural language narratives for different a
 **Target Audience:** Doctors, Radiologists, Medical Professionals
 
 
-### **Persona 2:  Patient**
-
-**Target Audience:** Patients, Family Members, Non-Medical Individuals
-
-
 ### **Persona 3:  Researcher**
 
 **Target Audience:** AI Researchers, Data Scientists, ML Engineers, Auditors
 
+### **Persona 3:  Patient**
 
+**Target Audience:** Patients, Family Members, Non-Medical Individuals
 
 
 ## Acknowledgments
@@ -161,6 +152,6 @@ Transform technical XAI results into natural language narratives for different a
 - **MedMNIST**: For providing standardized medical imaging datasets
 - **Wisconsin**: For providing standardized medical imaging datasets
 - **Captum**: Facebook's XAI library
-- **Ollama**: Llama API for narrative generation
+- **Meta Llama**: Llama API for narrative generation
 - **Hugging Face**: Open-source LLM infrastructure
 - **Kapcia, M., Eshkiki, H., Duell, J., Fan, X., Zhou, S., & Mora, B. (n.d.). ExMed**: An AI tool for experimenting explainable AI techniques on medical data analytics
