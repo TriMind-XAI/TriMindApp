@@ -3,15 +3,13 @@
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.7.1-red.svg)](https://pytorch.org/)
 [![Streamlit](https://img.shields.io/badge/Streamlit-1.54.0-FF4B4B.svg)](https://streamlit.io/)
 
-A medical AI explanation tool that translates complex machine learning predictions into clear, natural language narratives that doctors and patients can understand
-
-<img width="1406" height="756" alt="dashboard" src="https://github.com/user-attachments/assets/3769e8b1-8f6f-49da-92c6-f9c0d0f46836" />
+A medical AI explanation tool that translates complex machine learning predictions into clear, natural language narratives that doctors and patients can understan
 
 ##  Features
 
 - **Multiple AI Models**: ResNet8, Custom CNN architectures (image data), ML Models and MLP (tabular data)
 - **4 XAI Methods**: Integrated Gradients, GradCAM, Saliency Maps, GradientSHAP, SHAP, Counterfacuals
-- **Consistency Analysis**: Cross-validation between explanation methods
+- **Consistency Analysis**: Cross-validation between explanation methods using Spearman
 - **LLM Narratives**: Audience-specific explanations (Clinician, Patient, Researcher)
 - **Interactive Dashboard**: Streamlit-based web interface
 
