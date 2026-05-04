@@ -171,7 +171,7 @@ Transform technical XAI results into natural language narratives for different a
 ## Contributors
 - Aderonke Adelabu
 - Akinpelumi Ajayi
-- Amjad Alhaffar amjad.alhaffar.aa@gmail.com
+- [Amjad Alahffar](https://www.linkedin.com/in/amjadalhaffarsyr/)
 
 **Supervisor: Dr. Jamie Duell**
 
