@@ -169,9 +169,9 @@ Transform technical XAI results into natural language narratives for different a
 - **Hugging Face**: Open-source LLM infrastructure
 - **Kapcia, M., Eshkiki, H., Duell, J., Fan, X., Zhou, S., & Mora, B. (n.d.). ExMed**: An AI tool for experimenting explainable AI techniques on medical data analytics
 ## Contributors
-- Aderonke Adelabu
-- Akinpelumi Ajayi
-- [Amjad Alahffar](https://www.linkedin.com/in/amjadalhaffarsyr/)
+- [Aderonke Adelabu](https://www.linkedin.com/in/aderonke-kausar-adelabu/)
+- [Akinpelumi Ajayi](https://www.linkedin.com/in/akinpelumi-michael-ajayi-/)
+- [Amjad Alhaffar](https://www.linkedin.com/in/amjadalhaffarsyr/)
 
 **Supervisor: Dr. Jamie Duell**
 
